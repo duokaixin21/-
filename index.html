@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f8f0">
+  <title>问心之境 · 学校关怀工作台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #faf9f2;
+      --paper-strong: #fffefa;
+      --sage-50: #f2f4e9;
+      --sage-100: #e9eddd;
+      --sage-200: #d9e2cd;
+      --sage-400: #9ca987;
+      --sage-600: #718265;
+      --forest: #3e5746;
+      --ink: #313f35;
+      --muted: #818a78;
+      --line: #e6e7d9;
+      --amber: #ca8733;
+      --amber-100: #fbf0da;
+      --red: #ad5f4b;
+      --red-100: #f7e8e3;
+      --blue: #647b76;
+      --shadow: 0 18px 48px rgba(59, 72, 54, .08);
+      font-family: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
+    button, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); }
+    .sidebar { display: flex; flex-direction: column; min-height: 100vh; padding: 28px 18px 22px; background: #f0f2e7; border-right: 1px solid var(--line); }
+    .brand { padding: 3px 10px 28px; }
+    .brand-name { font-family: "STSong", "Songti SC", serif; font-size: 27px; font-weight: 700; letter-spacing: 2px; }
+    .brand-en { margin-top: 7px; color: var(--sage-600); font-size: 9px; letter-spacing: 2.4px; }
+    .brand-sub { margin-top: 20px; color: var(--muted); font-family: "STSong", serif; font-size: 13px; }
+    .nav-label { padding: 10px 12px 9px; color: #9aa18f; font-size: 10px; letter-spacing: 1.7px; }
+    .nav { display: grid; gap: 5px; }
+    .nav-btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 0 13px; border: 0; border-radius: 10px; color: #78836e; background: transparent; text-align: left; transition: .18s ease; }
+    .nav-btn:hover { background: rgba(217, 226, 205, .56); color: var(--forest); }
+    .nav-btn.active { color: var(--forest); background: #dde6d2; font-weight: 650; }
+    .nav-icon { display: grid; place-items: center; width: 20px; font-size: 17px; }
+    .nav-count { margin-left: auto; min-width: 20px; padding: 2px 6px; border-radius: 10px; color: #8e6840; background: var(--amber-100); font-size: 10px; text-align: center; }
+    .side-note { margin-top: auto; padding: 16px 13px 0; color: var(--muted); font-family: "STSong", serif; font-size: 12px; line-height: 1.9; }
+    .side-note .leaf { display: block; margin-bottom: 7px; color: var(--sage-600); font-size: 18px; }
+    .main { min-width: 0; padding: 0 38px 26px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 68px; border-bottom: 1px solid var(--line); }
+    .boundary-bar { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 11px 14px; border: 1px solid #dfe5d5; border-radius: 8px; color: #51624f; background: #f0f3e8; }
+    .boundary-mark { display: grid; flex: 0 0 auto; place-items: center; width: 26px; height: 26px; border-radius: 50%; color: var(--forest); background: #dce6d1; font-size: 13px; }
+    .boundary-copy { min-width: 0; font-size: 10px; line-height: 1.7; }
+    .boundary-copy strong { margin-right: 7px; color: #405643; font-size: 10px; }
+    .boundary-items { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+    .boundary-item { padding: 4px 7px; border-radius: 5px; color: #687563; background: rgba(255,255,255,.72); font-size: 9px; white-space: nowrap; }
+    .workspace-title { font-family: "STSong", serif; font-size: 13px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .demo-badge { padding: 6px 10px; border: 1px solid #e9dfc5; border-radius: 20px; color: #98753e; background: #fcf7e9; font-size: 10px; }
+    .role-switch { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper-strong); }
+    .role-switch button { padding: 7px 11px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: 11px; }
+    .role-switch button.active { color: white; background: var(--forest); }
+    .profile { display: flex; align-items: center; gap: 9px; margin-left: 4px; font-size: 12px; }
+    .avatar { display: grid; place-items: center; width: 31px; height: 31px; border: 1px solid #dfe4d3; border-radius: 50%; color: var(--forest); background: #e7eddd; }
+    .page { display: none; padding: 31px 0 30px; animation: arrive .24s ease; }
+    .page.active { display: block; }
+    @keyframes arrive { from { opacity: .35; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .eyebrow { color: #8c946f; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+    h1 { margin: 10px 0 7px; color: #334238; font-family: "STSong", "Songti SC", serif; font-size: 30px; line-height: 1.35; }
+    .lead { margin: 0; color: var(--muted); font-family: "STSong", serif; font-size: 13px; line-height: 1.8; }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 23px; }
+    .head-actions { display: flex; align-items: center; gap: 9px; padding-bottom: 3px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 8px; color: white; background: var(--forest); font-size: 12px; transition: transform .15s ease, background .15s ease; }
+    .btn:hover { background: #304736; transform: translateY(-1px); }
+    .btn.soft { color: var(--forest); background: var(--sage-100); }
+    .btn.soft:hover { background: var(--sage-200); }
+    .btn.outline { border-color: var(--line); color: var(--forest); background: var(--paper-strong); }
+    .btn.warning { background: var(--amber); }
+    .btn.danger { background: var(--red); }
+    .btn.small { min-height: 31px; padding: 0 10px; font-size: 11px; }
+    .icon-btn { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--paper-strong); }
+    .grid { display: grid; gap: 15px; }
+    .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 17px; }
+    .panel, .stat { border: 1px solid var(--line); border-radius: 10px; background: var(--paper-strong); }
+    .stat { padding: 17px 18px 14px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; }
+    .stat-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: var(--sage-600); background: var(--sage-50); font-size: 14px; }
+    .stat-value { display: flex; align-items: baseline; gap: 7px; margin-top: 11px; font-size: 28px; font-weight: 650; }
+    .stat-unit { color: var(--muted); font-size: 11px; font-weight: 400; }
+    .stat-foot { margin-top: 6px; color: #9a9e8b; font-size: 10px; }
+    .stat-foot .up { color: var(--amber); }
+    .dashboard-grid { grid-template-columns: minmax(0, 1.38fr) minmax(285px, .92fr); align-items: start; }
+    .panel { overflow: hidden; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid #efefe6; }
+    .panel-title { font-size: 13px; font-weight: 650; }
+    .panel-sub { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .panel-body { padding: 17px 18px; }
+    .trend-chart { display: block; width: 100%; height: auto; min-height: 210px; overflow: visible; }
+    .trend-chart text { fill: #8d9687; font-family: inherit; font-size: 10px; }
+    .trend-chart .gridline { stroke: #e9ebdf; stroke-width: 1; }
+    .trend-chart .trendline { fill: none; stroke: #718a68; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
+    .trend-chart .trendarea { fill: #e8eee0; opacity: .8; }
+    .trend-chart .point { fill: #fffefa; stroke: #718a68; stroke-width: 2; }
+    .trend-chart .point.current { fill: #d49a4a; stroke: #fffefa; stroke-width: 3; }
+    .trend-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; color: var(--muted); font-size: 10px; }
+    .trend-meta strong { color: var(--forest); font-size: 11px; }
+    .aggregate-note { display: flex; align-items: flex-start; gap: 9px; margin-top: 13px; padding: 10px 12px; border-radius: 7px; color: #687663; background: var(--sage-50); font-size: 10px; line-height: 1.7; }
+    .aggregate-note span { color: var(--sage-600); font-size: 15px; }
+    .privacy-guard { display: grid; grid-template-columns: 32px minmax(0,1fr); gap: 10px; margin-bottom: 15px; padding: 13px 15px; border: 1px solid #dfe5d5; border-radius: 8px; background: #f0f3e8; }
+    .privacy-guard .mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--forest); background: #dce6d1; }
+    .privacy-guard strong { display: block; color: #405643; font-size: 11px; }
+    .privacy-guard p { margin: 4px 0 0; color: #697563; font-size: 10px; line-height: 1.7; }
+    .school-metrics { display: flex; flex-wrap: wrap; gap: 7px; }
+    .queue-list { display: grid; }
+    .queue-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 11px; align-items: center; padding: 13px 18px; border-bottom: 1px solid #f0f0e9; }
+    .queue-row:last-child { border-bottom: 0; }
+    .level { display: inline-flex; align-items: center; justify-content: center; min-width: 37px; height: 24px; border-radius: 6px; color: #657b5c; background: var(--sage-100); font-size: 10px; font-weight: 650; }
+    .level.l2 { color: #956626; background: #faf0dc; }.level.l3 { color: #9b5643; background: var(--red-100); }.level.l4 { color: white; background: #a64f43; }
+    .queue-main { min-width: 0; }
+    .queue-name { font-size: 11px; font-weight: 650; }
+    .queue-meta { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .queue-deadline { color: #a27b41; font-size: 10px; text-align: right; }
+    .queue-deadline.urgent { color: var(--red); }
+    .critical-alert { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: center; margin: -6px 0 16px; padding: 14px 16px; border: 1px solid #ebc9b9; border-left: 4px solid #b45d48; border-radius: 9px; background: #fbefea; }
+    .critical-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: white; background: #ad5f4b; font-weight: 700; }
+    .critical-title { color: #854b3b; font-size: 12px; font-weight: 700; }
+    .critical-copy { margin-top: 4px; color: #85685e; font-size: 10px; line-height: 1.6; }
+    .subhead { display: flex; align-items: center; justify-content: space-between; margin: 23px 0 12px; }
+    .subhead h2 { margin: 0; font-family: "STSong", serif; font-size: 17px; }
+    .subhead small { color: var(--muted); font-size: 10px; }
+    .muted-chip { display: inline-block; padding: 4px 7px; border-radius: 5px; color: #8b8e81; background: #f1f2eb; }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter { min-height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: var(--paper-strong); font-size: 10px; }
+    .filter.active { border-color: var(--forest); color: white; background: var(--forest); }
+    .metric-tab { min-height: 31px; padding: 0 11px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: var(--paper-strong); font-size: 10px; }
+    .metric-tab.active { border-color: var(--forest); color: white; background: var(--forest); }
+    .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .task-card { position: relative; padding: 17px; }
+    .task-top { display: flex; align-items: center; justify-content: space-between; }
+    .task-id { color: #728269; font-size: 10px; letter-spacing: 1px; }
+    .task-name { margin: 14px 0 5px; font-size: 14px; font-weight: 650; }
+    .task-hint { color: var(--muted); font-family: "STSong", serif; font-size: 11px; line-height: 1.75; }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; color: #92988a; font-size: 10px; }
+    .task-actions { display: flex; gap: 7px; margin-top: 15px; }
+    .task-actions .btn { flex: 1; }
+    .status { padding: 4px 7px; border-radius: 5px; color: #657c62; background: var(--sage-50); font-size: 9px; }
+    .status.pending { color: #956626; background: var(--amber-100); }.status.expired { color: #9b5947; background: var(--red-100); }
+    .empty-note { padding: 30px 15px; color: var(--muted); font-family: "STSong", serif; font-size: 12px; text-align: center; }
+    .case-layout { display: grid; grid-template-columns: minmax(0, 1fr) 315px; gap: 15px; align-items: start; }
+    .case-item { display: grid; grid-template-columns: 55px minmax(0, 1fr) auto; gap: 13px; align-items: center; padding: 15px 18px; border-bottom: 1px solid #efefe7; cursor: pointer; transition: background .15s; }
+    .case-item:hover, .case-item.selected { background: #f7f8f0; }
+    .case-item:last-child { border-bottom: 0; }
+    .case-avatar { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 50%; color: #788969; background: #edf1e4; font-family: "STSong", serif; font-size: 14px; }
+    .sla { margin-top: 5px; color: #a37a3c; font-size: 10px; }
+    .case-side { padding: 17px; }
+    .case-side h3 { margin: 0 0 4px; font-size: 14px; }
+    .case-side .patient { margin-bottom: 15px; color: var(--muted); font-size: 10px; }
+    .signal { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eff0e9; font-size: 10px; }
+    .signal span:first-child { color: var(--muted); }.signal b { font-weight: 550; text-align: right; }
+    .notice { margin-top: 13px; padding: 11px; border-radius: 7px; color: #6e796b; background: var(--sage-50); font-family: "STSong", serif; font-size: 10px; line-height: 1.8; }
+    .identity-lock { margin-top: 14px; padding: 13px; border: 1px dashed #d7dacb; border-radius: 8px; background: #fafaf5; }
+    .identity-lock strong { display: block; margin-bottom: 5px; font-size: 10px; }
+    .identity-lock p { margin: 0 0 10px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+    .identity-fields { display: grid; gap: 8px; margin: 13px 0; }
+    .identity-fields div { display: flex; justify-content: space-between; gap: 9px; font-size: 10px; }
+    .identity-fields span:first-child { color: var(--muted); }
+    .timeline { position: relative; display: grid; gap: 0; padding-left: 13px; }
+    .timeline::before { position: absolute; top: 6px; bottom: 8px; left: 3px; width: 1px; background: #dfe5d7; content: ""; }
+    .timeline-item { position: relative; padding: 0 0 14px 7px; }
+    .timeline-item::before { position: absolute; top: 4px; left: -13px; width: 7px; height: 7px; border: 2px solid white; border-radius: 50%; background: #91a183; box-shadow: 0 0 0 1px #91a183; content: ""; }
+    .timeline-time { color: #999d90; font-size: 9px; }
+    .timeline-text { margin-top: 4px; font-size: 10px; line-height: 1.6; }
+    .timeline-tag { display: inline-block; margin-top: 5px; padding: 3px 6px; border-radius: 4px; color: #70805f; background: var(--sage-50); font-size: 9px; }
+    .workflow-steps { display: grid; grid-template-columns: repeat(4, 1fr); margin: 4px 0 22px; border: 1px solid var(--line); border-radius: 9px; background: #fffefa; }
+    .step { position: relative; display: flex; align-items: center; gap: 9px; padding: 14px 15px; color: #8b9384; font-size: 10px; }
+    .step:not(:last-child)::after { position: absolute; top: 50%; right: -5px; z-index: 1; width: 9px; height: 9px; border-top: 1px solid #d7ddce; border-right: 1px solid #d7ddce; background: #fffefa; content: ""; transform: translateY(-50%) rotate(45deg); }
+    .step-num { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #748266; background: var(--sage-100); font-size: 10px; }
+    .step.done { color: var(--forest); }.step.done .step-num { color: white; background: var(--sage-600); }
+    .apply-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 15px; align-items: start; }
+    .form { display: grid; gap: 15px; }
+    .field label { display: block; margin-bottom: 7px; color: #687563; font-size: 11px; }
+    .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 7px; outline: none; color: var(--ink); background: #fffefa; }
+    .field select { min-height: 39px; padding: 0 10px; }
+    .field textarea { min-height: 95px; padding: 10px; resize: vertical; font-size: 11px; line-height: 1.7; }
+    .field select:focus, .field textarea:focus { border-color: #9baa8c; box-shadow: 0 0 0 3px rgba(156, 169, 135, .15); }
+    .choice-list { display: grid; gap: 7px; }
+    .choice { display: flex; align-items: flex-start; gap: 9px; padding: 11px; border: 1px solid var(--line); border-radius: 7px; background: #fffefa; cursor: pointer; }
+    .choice input { accent-color: var(--forest); }.choice strong { display: block; font-size: 10px; font-weight: 600; }.choice small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.6; }
+    .permission-note { margin: 0; padding: 12px; border-radius: 7px; color: #667562; background: var(--sage-50); font-family: "STSong", serif; font-size: 10px; line-height: 1.8; }
+    .footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 23px; padding-top: 14px; border-top: 1px solid var(--line); color: #a0a392; font-family: "STSong", serif; font-size: 10px; }
+    .footer .right { text-align: right; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(37, 49, 39, .28); backdrop-filter: blur(3px); }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(480px, 100%); max-height: min(90vh, 730px); overflow: auto; padding: 22px; border: 1px solid #e1e3d4; border-radius: 11px; background: var(--paper-strong); box-shadow: var(--shadow); animation: arrive .2s ease; }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 16px; }
+    .modal-head h2 { margin: 0; font-family: "STSong", serif; font-size: 19px; }
+    .modal-head p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+    .modal-content { display: grid; gap: 14px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .checkline { display: flex; align-items: flex-start; gap: 8px; color: #596658; font-size: 10px; line-height: 1.7; }
+    .checkline input { margin-top: 2px; accent-color: var(--forest); }
+    .toast { position: fixed; right: 24px; bottom: 22px; z-index: 20; max-width: min(360px, calc(100vw - 32px)); padding: 12px 16px; border: 1px solid #dfe4d5; border-radius: 8px; color: var(--forest); background: white; box-shadow: var(--shadow); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s; }
+    .toast.show { opacity: 1; transform: none; }
+    .mobile-menu { display: none; }
+    @media (max-width: 1050px) {
+      .shell { grid-template-columns: 214px minmax(0, 1fr); }.main { padding-right: 24px; padding-left: 24px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }.dashboard-grid, .case-layout, .apply-layout { grid-template-columns: 1fr; }
+      .case-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }.case-side h3, .case-side .patient, .case-side .identity-lock, .case-side .notice { grid-column: 1 / -1; }
+    }
+    @media (max-width: 700px) {
+      .shell { display: block; }.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 6; width: 245px; min-height: 100dvh; box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .22s ease; }.sidebar.open { transform: none; }
+      .main { padding: 0 16px 20px; }.topbar { min-height: 58px; }.mobile-menu { display: grid; place-items: center; width: 32px; height: 32px; margin-right: 10px; border: 0; border-radius: 7px; color: var(--forest); background: var(--sage-100); }
+      .top-left { display: flex; align-items: center; }.top-actions { gap: 7px; }.profile span { display: none; }.demo-badge { display: none; }.role-switch button { padding: 7px 8px; font-size: 10px; }
+      .boundary-bar { align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 10px; }.boundary-items { width: 100%; margin-left: 34px; }.boundary-item { white-space: normal; }
+      .page { padding-top: 24px; }.page-head { align-items: flex-start; flex-direction: column; gap: 12px; } h1 { font-size: 25px; }.lead { font-size: 12px; }
+      .stats { gap: 9px; }.stat { padding: 13px; }.stat-value { font-size: 24px; }.dashboard-grid { gap: 10px; }.panel-head, .panel-body { padding-right: 13px; padding-left: 13px; }
+      .task-grid { grid-template-columns: 1fr; }.case-item { grid-template-columns: 42px minmax(0, 1fr) auto; gap: 8px; padding: 13px; }.case-item .btn { padding: 0 8px; }
+      .case-side { display: block; }.workflow-steps { grid-template-columns: repeat(2, 1fr); }.step:nth-child(2)::after { display: none; }.step { padding: 11px; }
+      .critical-alert { grid-template-columns: 30px minmax(0,1fr); padding: 12px; }.critical-alert .btn { grid-column: 1 / -1; width: 100%; }
+      .footer { align-items: flex-start; flex-direction: column; }.footer .right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-name">✳ 问心之境</div>
+        <div class="brand-en">WENXIN · CAMPUS COMPANION</div>
+        <div class="brand-sub">让每一次关心都有边界</div>
+      </div>
+      <div class="nav-label" id="nav-label">COUNSELOR SPACE</div>
+      <nav class="nav" id="navigation"></nav>
+      <div class="side-note"><span class="leaf">✿</span>把关心交给恰当的人。<br>身份与对话，始终留在边界之外。</div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="top-left"><button class="mobile-menu" id="mobile-menu" aria-label="打开导航">☰</button><div class="workspace-title">问心之境 · 学校心理预警与关怀</div></div>
+        <div class="top-actions">
+          <span class="demo-badge">交互原型 · 模拟数据</span>
+          <div class="role-switch" role="group" aria-label="演示角色">
+            <button class="active" data-role="counselor">辅导员</button><button data-role="psychologist">心理老师</button>
+          </div>
+          <div class="profile"><div class="avatar" id="profile-avatar">辅</div><span id="profile-name">辅导员 · 林老师</span></div>
+        </div>
+      </header>
+      <div class="boundary-bar" id="boundary-bar" role="note"></div>
+
+      <section class="page active" id="page-overview"></section>
+      <section class="page" id="page-school"></section>
+      <section class="page" id="page-tasks"></section>
+      <section class="page" id="page-request"></section>
+      <section class="page" id="page-queue"></section>
+      <section class="page" id="page-case"></section>
+      <footer class="footer"><span>问心之境 · 陪你照顾心情，也陪你走进生活</span><span class="right">附近与远方 · 总有一处适合此刻的你</span></footer>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="modal-backdrop" role="presentation"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"></div></div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const icons = { overview: "⌂", school: "⌘", tasks: "▤", request: "✧", queue: "◷", case: "◉" };
+    const navItems = {
+      counselor: [
+        { id: "tasks", label: "关怀任务", icon: icons.tasks },
+        { id: "request", label: "申请协同", icon: icons.request },
+        { id: "overview", label: "年级态势", icon: icons.overview },
+        { id: "school", label: "全校趋势", icon: icons.school }
+      ],
+      psychologist: [
+        { id: "queue", label: "预警队列", icon: icons.queue, count: 4 },
+        { id: "case", label: "个案处置", icon: icons.case }
+      ]
+    };
+    const state = {
+      role: "counselor", page: "overview", schoolMetric: "mood", selectedCase: "WX-24081", verified: false,
+      tasks: [
+        { id: "WX-T081", level: "L2", action: "本周内安排一次非正式关心", due: "11月22日", status: "待联系", consent: true },
+        { id: "WX-T076", level: "L1", action: "下周留意近况，保持自然接触", due: "11月24日", status: "待联系", consent: false },
+        { id: "WX-T069", level: "L2", action: "近期提供一次线下支持", due: "11月18日", status: "已联系", consent: false }
+      ],
+      cases: [
+        { id: "WX-24081", level: "L4", alias: "匿名个案 24081", time: "今天 14:26", sla: "即时响应", state: "待复核", flags: ["即时危险结构信号", "行为变化连续出现"] },
+        { id: "WX-24076", level: "L3", alias: "匿名个案 24076", time: "今天 13:48", sla: "剩余 18 分钟", state: "待复核", flags: ["明确计划信号", "近 48 小时频次升高"] },
+        { id: "WX-24069", level: "L2", alias: "匿名个案 24069", time: "今天 11:05", sla: "剩余 19 小时", state: "待复核", flags: ["自伤意念标签", "置信度 0.86"] },
+        { id: "WX-24052", level: "L2", alias: "匿名个案 24052", time: "昨天 16:32", sla: "剩余 4 小时", state: "观察中", flags: ["持续低落标签", "睡眠节律变化"] }
+      ]
+    };
+
+    const pages = ["overview", "school", "tasks", "request", "queue", "case"];
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const levelClass = (level) => level.toLowerCase();
+    const selectedCase = () => state.cases.find(item => item.id === state.selectedCase) || state.cases[0];
+
+    function setNavigation() {
+      const menu = navItems[state.role];
+      $("#navigation").innerHTML = menu.map(item => `<button class="nav-btn ${state.page === item.id ? "active" : ""}" data-page="${item.id}"><span class="nav-icon">${item.icon}</span><span>${item.label}</span>${item.count ? `<span class="nav-count">${item.count}</span>` : ""}</button>`).join("");
+      $$(".nav-btn").forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.page)));
+      $("#nav-label").textContent = state.role === "counselor" ? "COUNSELOR SPACE" : "CARE TEAM SPACE";
+      $("#profile-avatar").textContent = state.role === "counselor" ? "辅" : "心";
+      $("#profile-name").textContent = state.role === "counselor" ? "辅导员 · 林老师" : "心理老师 · 周老师";
+      $("#boundary-bar").innerHTML = state.role === "counselor"
+        ? `<span class="boundary-mark">⌑</span><div class="boundary-copy"><strong>辅导员 · 年级聚合视角</strong>只看负责年级整体趋势，不查看个人预警个案。</div><div class="boundary-items"><span class="boundary-item">无班级 / 院系拆分</span><span class="boundary-item">少于 5 人显示“少量”</span><span class="boundary-item">无个人搜索与下钻</span></div>`
+        : `<span class="boundary-mark">⌑</span><div class="boundary-copy"><strong>心理老师 · 专业处置视角</strong>查看结构化信号与时间线；身份须二次验证。</div><div class="boundary-items"><span class="boundary-item">无聊天原文</span><span class="boundary-item">无语音与表情原图</span><span class="boundary-item">身份查看留审计</span></div>`;
+    }
+
+    function navigate(page) {
+      state.page = page;
+      pages.forEach(id => $("#page-" + id).classList.toggle("active", id === page));
+      setNavigation();
+      if (page === "overview") renderOverview();
+      if (page === "school") renderSchoolTrend();
+      if (page === "tasks") renderTasks();
+      if (page === "request") renderRequest();
+      if (page === "queue") renderQueue();
+      if (page === "case") renderCase();
+      $("#sidebar").classList.remove("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function pageHead(eyebrow, title, lead, action = "") {
+      return `<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p class="lead">${lead}</p></div>${action ? `<div class="head-actions">${action}</div>` : ""}</div>`;
+    }
+
+    function trendSVG(values, labels, accessibleLabel) {
+      const width = 720, height = 250, left = 42, right = 12, top = 18, bottom = 34;
+      const chartWidth = width - left - right, chartHeight = height - top - bottom;
+      const x = index => left + (chartWidth * index / (values.length - 1));
+      const y = value => top + chartHeight * (1 - (value - 35) / 55);
+      const points = values.map((value, index) => `${x(index)},${y(value)}`).join(" ");
+      const area = `${left},${top + chartHeight} ${points} ${x(values.length - 1)},${top + chartHeight}`;
+      const grid = [40, 60, 80].map(value => `<line class="gridline" x1="${left}" y1="${y(value)}" x2="${width-right}" y2="${y(value)}"></line><text x="${left-10}" y="${y(value)+4}" text-anchor="end">${value}</text>`).join("");
+      const dots = values.map((value, index) => `<circle class="point ${index === values.length - 1 ? "current" : ""}" cx="${x(index)}" cy="${y(value)}" r="${index === values.length - 1 ? 5 : 3}"><title>${labels[index]} 周趋势</title></circle><text x="${x(index)}" y="${height-8}" text-anchor="middle">${labels[index]}</text>`).join("");
+      return `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${accessibleLabel}"><text x="${left}" y="11">趋势指数</text>${grid}<polygon class="trendarea" points="${area}"></polygon><polyline class="trendline" points="${points}"></polyline>${dots}</svg>`;
+    }
+
+    function renderOverview() {
+      $("#page-overview").innerHTML = pageHead("COUNSELOR · GRADE TREND", "年级态势，安心看趋势", "辅导员负责年级关怀：只呈现延迟汇总的整体指数，不列风险人数或班级名单。", `<button class="btn soft" data-page="school">查看全校趋势 ↗</button>`) + `
+        <div class="grid stats">
+          <article class="stat"><div class="stat-top"><span>统计范围</span><span class="stat-icon">⌂</span></div><div class="stat-value" style="font-size:22px">负责年级</div><div class="stat-foot">不拆班级 / 院系</div></article>
+          <article class="stat"><div class="stat-top"><span>年级整体走势</span><span class="stat-icon">⌁</span></div><div class="stat-value" style="font-size:22px">平稳</div><div class="stat-foot">近 8 周指数变化</div></article>
+          <article class="stat"><div class="stat-top"><span>小样本保护</span><span class="stat-icon">⌑</span></div><div class="stat-value" style="font-size:22px">已启用</div><div class="stat-foot">年级覆盖需达到 30</div></article>
+          <article class="stat"><div class="stat-top"><span>个人下钻</span><span class="stat-icon">⊘</span></div><div class="stat-value" style="font-size:22px">不可用</div><div class="stat-foot">无个人检索入口</div></article>
+        </div>
+        <div class="privacy-guard"><span class="mark">⌑</span><div><strong>先保护隐私，再展示趋势</strong><p>仅统计负责年级的整体变化，按周延迟汇总；年级覆盖少于 30 人不展示趋势，任一风险信号组少于 5 人统一显示“少量”。不提供班级 / 院系拆分、风险人数、名单或个人下钻。</p></div></div>
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">负责年级 · 心理状态整体趋势</div><div class="panel-sub">最近 8 周 · 聚合指数，仅用于观察变化方向</div></div><span class="muted-chip">周汇总</span></div><div class="panel-body">${trendSVG([62,64,60,65,67,66,69,70],["8周前","7周前","6周前","5周前","4周前","3周前","2周前","最近完整周"],"负责年级最近八周整体趋势") }<div class="trend-meta"><span>指数只表达总体变化，不代表风险人数</span><strong>总体平稳</strong></div></div></article>`;
+      $("[data-page='school']", $("#page-overview"))?.addEventListener("click", () => navigate("school"));
+    }
+
+    function renderSchoolTrend() {
+      const mood = state.schoolMetric !== "support";
+      const values = mood ? [60,63,62,65,64,68,69,70] : [48,51,50,55,57,58,60,62];
+      const title = mood ? "全校心理状态整体趋势" : "全校支持服务参与趋势";
+      $("#page-school").innerHTML = pageHead("SCHOOL · AGGREGATE ONLY", "全校趋势，只看整体变化", "学校板块只呈现全校级别趋势，不展示年级对比、院系排行、风险人数或个案预警。", `<span class="muted-chip">仅趋势 · 无下钻</span>`) + `
+        <div class="privacy-guard"><span class="mark">⌑</span><div><strong>全校范围汇总，不回传个人或年级信息</strong><p>仅在全校样本达到最低门槛后，以延迟周汇总指数呈现；风险信号组少于 5 人不进入图表。页面不提供年级 / 院系筛选、排名、明细导出或风险名单。</p></div></div>
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">全校趋势图</div><div class="panel-sub">最近 8 周 · 仅显示汇总指数，不显示人数</div></div><div class="school-metrics"><button class="metric-tab ${mood ? "active" : ""}" data-metric="mood">心理状态</button><button class="metric-tab ${!mood ? "active" : ""}" data-metric="support">支持参与</button></div></div><div class="panel-body">${trendSVG(values,["8周前","7周前","6周前","5周前","4周前","3周前","2周前","最近完整周"],title)}<div class="trend-meta"><span>全校每周延迟汇总 · 指数不代表人数或百分比</span><strong>${mood ? "总体平稳" : "稳步上升"}</strong></div></div></article>
+        <div class="aggregate-note"><span>⌑</span><div>本页没有可识别的年级、班级、院系或个人维度。图表只用于观察学校整体变化，不用于识别或追踪个体。</div></div>`;
+      $$("[data-metric]").forEach(button => button.addEventListener("click", () => { state.schoolMetric = button.dataset.metric; renderSchoolTrend(); }));
+    }
+
+    function renderTasks() {
+      const tasks = state.tasks;
+      $("#page-tasks").innerHTML = pageHead("CARE CARDS", "关怀任务，轻轻接住", "只处理系统派发的任务。没有名单、搜索框或对话内容。", `<span class="muted-chip">限授权任务</span>`) + `
+        <div class="workflow-steps"><div class="step done"><i class="step-num">1</i>老师发起</div><div class="step done"><i class="step-num">2</i>学生授权</div><div class="step"><i class="step-num">3</i>任务执行</div><div class="step"><i class="step-num">4</i>心理老师确认</div></div>
+        <div class="subhead"><h2>我的任务卡</h2><small>身份信息仅在学生明确同意后限时开放</small></div>
+        <div class="grid task-grid">${tasks.map(task => `<article class="panel task-card"><div class="task-top"><span class="task-id">${task.id}</span><span class="status ${task.status === "待联系" ? "pending" : task.status === "已过期" ? "expired" : ""}">${task.status}</span></div><div class="task-name">${task.consent ? "陈同学 · 人文学院 2025级" : "匿名关怀任务"}</div><div class="task-hint">${task.action}</div><div class="task-meta"><span>风险等级 ${task.level}</span><span>有效至 ${task.due}</span><span>${task.consent ? "学生已授权 · 身份限时 7 天" : "匿名执行"}</span></div><div class="task-actions"><button class="btn soft small" data-task="${task.id}" data-outcome="已联系">已联系</button><button class="btn outline small" data-task="${task.id}" data-outcome="已转介">已转介</button><button class="btn outline small" data-task="${task.id}" data-outcome="未联系上">未联系上</button></div></article>`).join("")}</div>
+        <div class="aggregate-note" style="margin-top:17px"><span>✧</span><div>学生拒绝辅导员协同，不影响获得心理老师支持。拒绝后记录为“拒绝协同”，转入定期关注。</div></div>`;
+      $$('[data-task]').forEach(button => button.addEventListener("click", () => updateTask(button.dataset.task, button.dataset.outcome)));
+    }
+
+    function updateTask(id, outcome) {
+      const task = state.tasks.find(item => item.id === id);
+      if (!task) return;
+      task.status = outcome;
+      renderTasks();
+      toast(`已回填「${outcome}」，心理老师可确认后关闭任务。`);
+    }
+
+    function renderRequest() {
+      $("#page-request").innerHTML = pageHead("REQUEST SUPPORT", "申请一次温和的协同", "只能提出申请。心理老师复核后，系统会先询问学生是否愿意授权。") + `
+        <div class="workflow-steps"><div class="step done"><i class="step-num">1</i>提交申请</div><div class="step"><i class="step-num">2</i>心理老师审批</div><div class="step"><i class="step-num">3</i>学生自主选择</div><div class="step"><i class="step-num">4</i>获得限时任务卡</div></div>
+        <div class="grid apply-layout"><article class="panel"><div class="panel-head"><div><div class="panel-title">协同申请</div><div class="panel-sub">不填写姓名、学号或聊天内容</div></div><span class="level">辅导员入口</span></div><div class="panel-body"><form class="form" id="request-form"><div class="field"><label for="request-type">申请原因</label><select id="request-type" required><option value="">选择最接近的情况</option><option>近期希望获得一次额外关心</option><option>观察到班级整体状态有变化</option><option>需要了解适用的校内支持资源</option><option>其他非紧急关怀需要</option></select></div><div class="field"><label>申请范围</label><div class="choice-list"><label class="choice"><input type="radio" name="scope" value="current" checked><span><strong>由心理老师根据系统个案评估</strong><small>系统通过任务编号关联，不向辅导员返回身份信息。</small></span></label><label class="choice"><input type="radio" name="scope" value="class"><span><strong>班级层面的一般关怀建议</strong><small>仅请求不含个案信息的集体支持建议。</small></span></label></div></div><label class="checkline"><input type="checkbox" id="privacy-confirm" required><span>我确认此申请不涉及任何可识别个人的信息。</span></label><div><button class="btn" type="submit">提交给心理老师审批 ↗</button></div></form></div></article>
+          <aside class="panel"><div class="panel-head"><div><div class="panel-title">授权如何发生</div><div class="panel-sub">学生始终可以选择拒绝</div></div></div><div class="panel-body"><div class="timeline"><div class="timeline-item"><div class="timeline-time">01 · 心理老师审核</div><div class="timeline-text">判断是否适合由辅导员提供日常关怀。</div></div><div class="timeline-item"><div class="timeline-time">02 · 学生端询问</div><div class="timeline-text">“是否同意辅导员知道你的姓名与本次风险等级，以便安排一次关心？”</div></div><div class="timeline-item"><div class="timeline-time">03 · 生成限时任务</div><div class="timeline-text">仅同意后开放必要信息，任务卡 7 天后失效。</div></div><div class="timeline-item"><div class="timeline-time">04 · 学生拒绝</div><div class="timeline-text">不影响心理老师支持，记录拒绝协同并转为定期关注。</div></div></div><p class="permission-note">这条申请入口不提供“查看个案”能力。你提交后只会收到处理状态，不会看到学生预警详情。</p></div></aside></div>`;
+      $("#request-form").addEventListener("submit", event => {
+        event.preventDefault();
+        if (!$("#request-type").value || !$("#privacy-confirm").checked) return;
+        openModal("申请已送达", "心理老师完成复核后，系统将直接向学生征求授权。你不会收到身份或预警详情。", `<div class="permission-note">申请编号：WX-RQ-20261119<br>当前状态：等待心理老师复核</div>`, `<button class="btn" data-close>知道了</button>`);
+      });
+    }
+
+    function caseRow(item) {
+      return `<div class="case-item ${state.selectedCase === item.id ? "selected" : ""}" data-case="${item.id}"><span class="level ${levelClass(item.level)}">${item.level}</span><div class="queue-main"><div class="queue-name">${item.alias}</div><div class="queue-meta">${item.time} · ${item.state}</div></div><div class="sla ${item.level === "L4" || item.level === "L3" ? "urgent" : ""}">${item.sla}<br><span style="color:#a1a295">查看结构化信号 ↗</span></div></div>`;
+    }
+
+    function renderQueue() {
+      const cases = state.cases;
+      const critical = cases.find(item => item.level === "L4" && item.state === "待复核");
+      $("#page-queue").innerHTML = pageHead("RISK REVIEW", "预警队列，按时接住", "只看结构化风险信号与处置时间线，不提供学生与安安的聊天内容。", `<button class="btn soft" id="queue-refresh">↻ 刷新队列</button>`) + `
+        ${critical ? `<div class="critical-alert"><span class="critical-icon">!</span><div><div class="critical-title">L4 紧急预警 · 即时响应</div><div class="critical-copy">${critical.id} · ${critical.time} 检出结构化即时危险信号，需立即复核。</div></div><button class="btn danger" id="process-critical">立即复核 L4 ↗</button></div>` : `<div class="aggregate-note" style="margin:-6px 0 16px"><span>✓</span><div>当前没有待处理的 L4 紧急预警，请按队列时限处理其余个案。</div></div>`}
+        <div class="grid stats"><article class="stat"><div class="stat-top"><span>待复核</span><span class="stat-icon">◷</span></div><div class="stat-value">${cases.filter(c => c.state === "待复核").length}<span class="stat-unit">个案</span></div><div class="stat-foot">按等级与剩余时限排序</div></article><article class="stat"><div class="stat-top"><span>即时响应</span><span class="stat-icon" style="color:var(--red);background:var(--red-100)">!</span></div><div class="stat-value">${cases.filter(c => c.level === "L4").length}<span class="stat-unit">项</span></div><div class="stat-foot">L4 进入紧急流程</div></article><article class="stat"><div class="stat-top"><span>协同待授权</span><span class="stat-icon">✧</span></div><div class="stat-value">1<span class="stat-unit">项</span></div><div class="stat-foot">等待学生自主选择</div></article><article class="stat"><div class="stat-top"><span>本周已复核</span><span class="stat-icon">✓</span></div><div class="stat-value">18<span class="stat-unit">项</span></div><div class="stat-foot">处置记录均已留档</div></article></div>
+        <div class="filters" style="margin:0 0 13px"><button class="filter active" data-level="all">全部</button><button class="filter" data-level="L4">L4 紧急</button><button class="filter" data-level="L3">L3 高危</button><button class="filter" data-level="L2">L2 预警</button><button class="filter" data-level="open">待复核</button></div>
+        <div class="grid case-layout"><article class="panel"><div class="panel-head"><div><div class="panel-title">需要关注的个案</div><div class="panel-sub">姓名在二次验证后才可查看</div></div><span class="muted-chip">${cases.length} 项</span></div><div id="case-list">${cases.map(caseRow).join("")}</div></article><aside class="panel case-side" id="case-preview"></aside></div>`;
+      $$(".filter").forEach(button => button.addEventListener("click", () => {
+        $$(".filter").forEach(item => item.classList.remove("active")); button.classList.add("active");
+        const level = button.dataset.level;
+        const filtered = level === "all" ? state.cases : level === "open" ? state.cases.filter(item => item.state === "待复核") : state.cases.filter(item => item.level === level);
+        $("#case-list").innerHTML = filtered.length ? filtered.map(caseRow).join("") : `<div class="empty-note">当前没有符合条件的个案</div>`;
+        bindCaseRows();
+      }));
+      $("#queue-refresh").addEventListener("click", () => toast("队列已更新，按风险等级与 SLA 排序。"));
+      $("#process-critical")?.addEventListener("click", () => { state.selectedCase = critical.id; state.verified = false; navigate("case"); });
+      bindCaseRows(); renderCasePreview();
+    }
+
+    function bindCaseRows() {
+      $$('[data-case]').forEach(row => row.addEventListener("click", () => {
+        state.selectedCase = row.dataset.case; state.verified = false;
+        $$(".case-item").forEach(el => el.classList.toggle("selected", el.dataset.case === state.selectedCase)); renderCasePreview();
+      }));
+    }
+
+    function renderCasePreview() {
+      const item = selectedCase(); if (!$("#case-preview")) return;
+      $("#case-preview").innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h3>${item.alias}</h3><span class="level ${levelClass(item.level)}">${item.level}</span></div><div class="patient">${item.id} · ${item.time} · ${item.sla}</div><div class="panel-sub" style="margin:0 0 9px">结构化信号摘要</div>${item.flags.map(flag => `<div class="signal"><span>识别标签</span><b>${flag}</b></div>`).join("")}<div class="signal"><span>综合置信度</span><b>0.88 · 高</b></div><div class="signal"><span>响应时限</span><b>${item.level === "L4" ? "即时" : item.level === "L3" ? "30 分钟内" : "24 小时内"}</b></div><div class="notice">本页仅呈现语义标签、行为变化与置信度。聊天原文、语音和表情原图不进入学校端。</div>${state.verified ? `<div class="identity-lock" style="border-style:solid;background:#f4f6ed"><strong>身份已通过二次验证 · 最小必要信息</strong><div class="identity-fields"><div><span>姓名</span><b>陈同学</b></div><div><span>院系 / 班级</span><b>人文学院 · 2025级</b></div><div><span>宿舍楼</span><b>松风苑 3 栋</b></div><div><span>紧急联系人</span><b>已登记 · 点击查看</b></div></div><button class="btn outline small" id="hide-identity">收起身份信息</button></div>` : `<div class="identity-lock"><strong>身份信息已锁定</strong><p>完成二次验证后，仅为专业处置查看必要身份字段。该操作记入审计日志。</p><button class="btn soft small" id="verify-identity">二次验证查看身份</button></div>`}<div style="display:grid;gap:8px;margin-top:14px"><button class="btn" id="open-full-case">进入处置记录 ↗</button>${item.level === "L3" || item.level === "L4" ? `<button class="btn danger small" id="open-breakglass">紧急破窗审批</button>` : ""}</div>`;
+      $("#verify-identity")?.addEventListener("click", verifyIdentity);
+      $("#hide-identity")?.addEventListener("click", () => { state.verified = false; renderCasePreview(); });
+      $("#open-full-case")?.addEventListener("click", () => navigate("case"));
+      $("#open-breakglass")?.addEventListener("click", openBreakglass);
+    }
+
+    function renderCase() {
+      const item = selectedCase();
+      $("#page-case").innerHTML = pageHead("CASE TIMELINE", "个案处置记录", "复核信号、记录行动、安排回访。整个流程都不展示对话原文。", `<button class="btn soft" id="back-queue">← 返回队列</button>`) + `
+        <div class="grid case-layout"><article class="panel"><div class="panel-head"><div><div class="panel-title">${item.alias} · ${item.id}</div><div class="panel-sub">风险等级 ${item.level} · ${item.sla}</div></div><button class="btn outline small" id="case-verify">${state.verified ? "身份已核验" : "二次验证"}</button></div><div class="panel-body"><div class="subhead" style="margin-top:0"><h2>结构化时间线</h2><small>无聊天记录或原始语音</small></div><div class="timeline"><div class="timeline-item"><div class="timeline-time">今天 14:26 · 自动预警</div><div class="timeline-text">风险信号组合满足 ${item.level} 级复核条件。</div><span class="timeline-tag">语义标签：${item.flags[0]}</span></div><div class="timeline-item"><div class="timeline-time">今天 14:27 · 模型复核</div><div class="timeline-text">行为序列出现连续变化，综合置信度 0.88。</div><span class="timeline-tag">行为序列 · 置信度 0.88</span></div><div class="timeline-item"><div class="timeline-time">今天 14:30 · 待专业人员处置</div><div class="timeline-text">SLA：${item.level === "L4" ? "即时" : item.level === "L3" ? "30 分钟内" : "24 小时内"}完成复核。</div><span class="timeline-tag">待复核</span></div></div><div class="subhead"><h2>复核决定</h2><small>升降级必须填写理由</small></div><div class="filters"><button class="filter active" data-review="confirm">确认 ${item.level}</button><button class="filter" data-review="upgrade">升级</button><button class="filter" data-review="downgrade">降级</button></div><div class="field" style="margin-top:12px"><label for="review-reason">复核理由 <span style="color:var(--red)">必填</span></label><textarea id="review-reason" placeholder="记录结构化信号判断与专业依据，不填写对话原文"></textarea></div><div class="subhead"><h2>后续处置</h2><small>选择一个下一步行动</small></div><div class="choice-list"><label class="choice"><input type="radio" name="action" value="联系学生" checked><span><strong>直接联系学生</strong><small>由心理老师进行专业沟通与支持。</small></span></label><label class="choice"><input type="radio" name="action" value="辅导员协同"><span><strong>发起辅导员协同</strong><small>先向学生请求授权；拒绝不影响心理老师继续支持。</small></span></label><label class="choice"><input type="radio" name="action" value="转介校医院"><span><strong>转介校医院 / 精神卫生中心</strong><small>记录转介去向与学生接受情况。</small></span></label><label class="choice"><input type="radio" name="action" value="继续观察"><span><strong>继续观察并安排回访</strong><small>为 7 / 14 / 30 天回访选择计划。</small></span></label></div><div class="field" style="margin-top:13px"><label for="follow-up">回访时间</label><select id="follow-up"><option>7 天后</option><option>14 天后</option><option>30 天后</option></select></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn" id="save-review">保存复核与处置</button><button class="btn warning" id="request-coordination">发起协同授权</button></div></div></article><aside class="panel case-side"><h3>身份与权限</h3><div class="patient">仅心理老师可在二次验证后查看身份</div><div class="signal"><span>学生身份</span><b>${state.verified ? "陈同学 · 人文学院" : "已隐藏"}</b></div><div class="signal"><span>用户与安安对话</span><b>不可查看</b></div><div class="signal"><span>语音 / 表情原图</span><b>不可查看</b></div>${state.verified ? `<div class="identity-fields"><div><span>班级</span><b>2025级 2 班</b></div><div><span>宿舍</span><b>松风苑 3 栋</b></div><div><span>紧急联系人</span><b>已登记</b></div></div>` : `<div class="identity-lock"><strong>身份锁定中</strong><p>二次验证通过后展示姓名、班级及处置所需字段。</p><button class="btn soft small" id="case-verify-side">二次验证</button></div>`}<div class="notice">身份查看、复核决定、协同申请和紧急流程均写入审计记录。此原型使用模拟数据。</div></aside></div>`;
+      $("#back-queue").addEventListener("click", () => navigate("queue"));
+      $("#case-verify").addEventListener("click", verifyIdentity);
+      $("#case-verify-side")?.addEventListener("click", verifyIdentity);
+      $$("[data-review]").forEach(button => button.addEventListener("click", () => { $$("[data-review]").forEach(x => x.classList.remove("active")); button.classList.add("active"); }));
+      $("#save-review").addEventListener("click", saveReview);
+      $("#request-coordination").addEventListener("click", requestCoordination);
+    }
+
+    function verifyIdentity() {
+      openModal("心理老师二次验证", "演示流程：模拟验证通过后，显示当前个案处置所需的最小身份字段。实际系统需接入学校身份认证。", `<div class="field"><label for="verify-code">校内动态验证码</label><input id="verify-code" inputmode="numeric" placeholder="输入任意 6 位数字" maxlength="6" style="width:100%;height:39px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:#fffefa"></div><div class="permission-note">此次身份查看将写入审计日志，并绑定当前个案。</div>`, `<button class="btn outline" data-close>取消</button><button class="btn" id="confirm-verify">验证并查看</button>`);
+      $("#confirm-verify").addEventListener("click", () => {
+        if (( $("#verify-code").value || "" ).length < 4) { toast("请输入至少 4 位动态验证码。"); return; }
+        state.verified = true; closeModal();
+        if (state.page === "queue") renderCasePreview(); else renderCase();
+        toast("二次验证通过。身份字段已解锁并记录审计日志。");
+      });
+    }
+
+    function saveReview() {
+      const reason = $("#review-reason").value.trim();
+      const review = $("[data-review].active")?.dataset.review || "confirm";
+      if (!reason) { toast("请填写复核理由后保存。"); $("#review-reason").focus(); return; }
+      if (review !== "confirm" && reason.length < 8) { toast("升降级请补充更完整的专业依据。"); return; }
+      const item = selectedCase(); item.state = "已复核";
+      openModal("复核记录已保存", `已保存 ${review === "confirm" ? "确认等级" : review === "upgrade" ? "升级处置" : "降级处置"}、行动计划及审计时间。`, `<div class="permission-note">后续安排：${$("#follow-up").value}<br>处置行动：${$("input[name=action]:checked").value}</div>`, `<button class="btn" data-close>完成</button>`);
+    }
+
+    function requestCoordination() {
+      openModal("向学生请求协同授权", "仅由系统向学生本人展示授权选项。辅导员不会在学生选择前收到个案或身份信息。", `<div class="permission-note">“是否同意你的辅导员知道你的姓名与本次风险等级，以便安排一次关心？”<br><br>拒绝不影响你获得心理老师支持；系统将记录“拒绝协同”，并转为定期关注。</div><div class="field"><label for="coord-action">获授权后建议行动</label><select id="coord-action"><option>本周内安排一次非正式谈心</option><option>近期提供一次日常关心</option><option>协助了解校园支持资源</option></select></div>`, `<button class="btn outline" data-close>暂不发送</button><button class="btn" id="send-consent">发送授权询问</button>`);
+      $("#send-consent").addEventListener("click", () => {
+        closeModal();
+        openModal("模拟学生选择", "原型演示学生端的两种授权结果。", `<div class="permission-note">学生可以自由选择；两种结果都会保留心理老师的专业支持。</div>`, `<button class="btn outline" id="consent-no">拒绝授权</button><button class="btn" id="consent-yes">同意，生成 7 天任务</button>`);
+        $("#consent-yes").addEventListener("click", () => {
+          state.tasks.unshift({ id: "WX-T091", level: selectedCase().level, action: $("#coord-action")?.value || "本周内安排一次非正式谈心", due: "11月26日", status: "待联系", consent: true });
+          closeModal(); toast("学生已授权。限时 7 天任务卡已发送给辅导员。"); navigate("queue");
+        });
+        $("#consent-no").addEventListener("click", () => { closeModal(); toast("已记录“拒绝协同”，心理老师支持继续，转入定期关注。"); });
+      });
+    }
+
+    function openBreakglass() {
+      openModal("紧急破窗 · 双人审批", "仅适用于 L4 或 L3 失联。需要心理老师与学工值班负责人同时审批。", `<div class="permission-note">审批通过后生成 24 小时有效的最小身份包：姓名、班级、宿舍楼、紧急联系人。处置后 24 小时内补告知学生；如告知可能造成危险，须记录延后理由。</div><label class="checkline"><input type="checkbox" id="approve-psych"><span>心理老师确认：当前情形符合紧急破窗条件，并已核实风险时限。</span></label><label class="checkline"><input type="checkbox" id="approve-lead"><span>学工值班负责人确认：同意本次最小身份包临时授权。</span></label><div class="field"><label for="breakglass-reason">审批理由与学生告知安排</label><textarea id="breakglass-reason" placeholder="说明 L3 失联或即时危险的事实依据"></textarea></div>`, `<button class="btn outline" data-close>取消</button><button class="btn danger" id="approve-breakglass">双人审批并生成</button>`);
+      $("#approve-breakglass").addEventListener("click", () => {
+        if (!$("#approve-psych").checked || !$("#approve-lead").checked) { toast("须由心理老师与学工负责人双人审批。"); return; }
+        if ($("#breakglass-reason").value.trim().length < 8) { toast("请填写审批依据与告知安排。"); return; }
+        closeModal(); openModal("临时身份包已生成", "授权有效期至明日同一时间，处置完成后须补告知并生成审计报告。", `<div class="identity-fields"><div><span>姓名</span><b>陈同学</b></div><div><span>班级</span><b>人文学院 · 2025级</b></div><div><span>宿舍楼</span><b>松风苑 3 栋</b></div><div><span>紧急联系人</span><b>已登记</b></div><div><span>有效期</span><b>24 小时</b></div></div>`, `<button class="btn" data-close>知道了</button>`);
+      });
+    }
+
+    function openModal(title, description, content, actions) {
+      const backdrop = $("#modal-backdrop"), modal = $(".modal", backdrop);
+      modal.innerHTML = `<div class="modal-head"><div><h2 id="modal-title">${title}</h2><p>${description}</p></div><button class="icon-btn" aria-label="关闭" data-close>×</button></div><div class="modal-content">${content}</div><div class="modal-actions">${actions}</div>`;
+      backdrop.classList.add("open");
+      $$('[data-close]', modal).forEach(button => button.addEventListener("click", closeModal));
+    }
+    function closeModal() { $("#modal-backdrop").classList.remove("open"); }
+    function toast(message) { const el = $("#toast"); el.textContent = message; el.classList.add("show"); clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove("show"), 3200); }
+
+    $$("[data-role]").forEach(button => button.addEventListener("click", () => {
+      state.role = button.dataset.role; state.page = state.role === "counselor" ? "overview" : "queue"; state.verified = false;
+      $$("[data-role]").forEach(item => item.classList.toggle("active", item === button));
+      setNavigation(); navigate(state.page);
+    }));
+    $("#mobile-menu").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+    $("#modal-backdrop").addEventListener("click", event => { if (event.target === event.currentTarget) closeModal(); });
+    window.addEventListener("keydown", event => { if (event.key === "Escape") closeModal(); });
+    setNavigation(); renderOverview();
+  </script>
+</body>
+</html>
